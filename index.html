@@ -337,7 +337,7 @@
             display: "standalone",
             background_color: "#0f1115",
             theme_color: "#facc15",
-            orientation: "portrait",
+            orientation: "any",
             icons: [{
                 src: "https://placehold.co/192x192/0f1115/f59e0b.png?text=TNC7",
                 sizes: "192x192",
@@ -396,13 +396,13 @@
             <button class="btn-custom" onclick="document.getElementById('audioInput').click()">
                 <i class="fa-solid fa-music text-xs"></i> + Audio
             </button>
-            <input type="file" id="audioInput" accept="audio/*, audio/mpeg, audio/mp3, audio/wav, audio/ogg, audio/aac, .mp3, .wav, .m4a, .aac, .ogg, .flac" multiple class="hidden">
+            <input type="file" id="audioInput" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/mpeg, audio/wav, audio/ogg" multiple class="hidden">
             <button class="btn-custom" id="btnHapusAudio">Hapus Semua Audio</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
             
             <button class="btn-custom" onclick="document.getElementById('bgInput').click()">Background</button>
-            <input type="file" id="bgInput" accept="image/*, image/jpeg, image/png, image/webp, .jpg, .jpeg, .png, .webp, .gif" class="hidden">
+            <input type="file" id="bgInput" accept=".jpg, .jpeg, .png, .webp, .gif, image/jpeg, image/png, image/webp" class="hidden">
             <button class="btn-custom" id="btnHapusBg">Hapus Background</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
@@ -575,7 +575,7 @@
                 <div class="panel-header">OVERLAY</div>
                 
                 <div class="flex items-center gap-1">
-                    <input type="file" id="overlayInput" accept="image/*, video/*, .png, .jpg, .jpeg, .gif, .mp4, .webm, .mov" class="hidden">
+                    <input type="file" id="overlayInput" accept=".png, .jpg, .jpeg, .gif, .mp4, .webm, .mov, image/png, image/jpeg, video/mp4, video/webm" class="hidden">
                     <button class="btn-custom" onclick="document.getElementById('overlayInput').click()">
                         <span class="text-white">+ Overlay</span>
                     </button>
