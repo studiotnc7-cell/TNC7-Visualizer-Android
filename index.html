@@ -399,15 +399,15 @@
             <button class="btn-custom" onclick="document.getElementById('audioInput').click()">
                 <i class="fa-solid fa-music text-xs"></i> + Audio
             </button>
-            <!-- FIX: Menggunakan audio/* agar file manager Android mengizinkan MP3 secara universal -->
-            <input type="file" id="audioInput" accept="audio/*, .mp3, .wav, .m4a, .aac, .ogg, .flac" multiple class="hidden">
+            <!-- FIX: Simplified accept attribute for better Android compatibility -->
+            <input type="file" id="audioInput" accept="audio/*" multiple class="hidden">
             <button class="btn-custom" id="btnHapusAudio">Hapus Semua Audio</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
             
             <button class="btn-custom" onclick="document.getElementById('bgInput').click()">Background</button>
-            <!-- FIX: Menggunakan image/* untuk kompatibilitas Android -->
-            <input type="file" id="bgInput" accept="image/*, .jpg, .jpeg, .png, .webp, .gif" class="hidden">
+            <!-- FIX: Simplified accept attribute for better Android compatibility -->
+            <input type="file" id="bgInput" accept="image/*" class="hidden">
             <button class="btn-custom" id="btnHapusBg">Hapus Background</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
