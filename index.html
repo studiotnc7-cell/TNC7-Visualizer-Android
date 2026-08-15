@@ -309,15 +309,18 @@
             display: none !important;
         }
 
-        /* RESPONSIVE DESIGN UNTUK HP ANDROID */
-        @media (max-width: 768px) {
-            body { height: auto; min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
+        /* RESPONSIVE DESIGN UNTUK HP ANDROID & TABLET (PORTRAIT & LANDSCAPE) */
+        @media (max-width: 992px) {
+            body { height: auto; min-height: 100vh; overflow-y: auto; overflow-x: hidden; display: block; }
             .top-bar { height: auto; flex-wrap: wrap; padding: 10px; gap: 10px; justify-content: center; margin-top: 12px !important; }
             .top-bar .flex { flex-wrap: wrap; justify-content: center; }
-            .workspace { flex-direction: column; height: auto; overflow: visible; }
+            .workspace { flex-direction: column; height: auto; overflow: visible; display: flex; }
             .sidebar-left, .sidebar-right { width: 100%; max-height: none; overflow-y: visible; border-right: none; border-left: none; border-bottom: 1px solid var(--border-color); padding: 12px; }
-            .main-content { min-height: 60vh; padding: 10px; order: -1; /* Pindahkan preview ke atas di HP */ }
-            .preview-container { height: 40vh; min-height: 250px; }
+            .main-content { min-height: auto; padding: 10px; order: -1; }
+            
+            /* Menggunakan aspect-ratio agar canvas selalu proporsional saat layar diputar */
+            .preview-container { height: auto; aspect-ratio: 16/9; min-height: unset; width: 100%; max-height: 60vh; }
+            
             #password-screen .bg-\[\#161a22\] { width: 90%; max-width: 350px; padding: 20px; }
             .player-bar { flex-wrap: wrap; height: auto; padding: 10px; justify-content: center; }
             .player-bar .flex-1 { min-width: 100%; }
@@ -396,13 +399,15 @@
             <button class="btn-custom" onclick="document.getElementById('audioInput').click()">
                 <i class="fa-solid fa-music text-xs"></i> + Audio
             </button>
-            <input type="file" id="audioInput" accept=".mp3, .wav, .m4a, .aac, .ogg, .flac, audio/mpeg, audio/wav, audio/ogg" multiple class="hidden">
+            <!-- FIX: Menggunakan audio/* agar file manager Android mengizinkan MP3 secara universal -->
+            <input type="file" id="audioInput" accept="audio/*, .mp3, .wav, .m4a, .aac, .ogg, .flac" multiple class="hidden">
             <button class="btn-custom" id="btnHapusAudio">Hapus Semua Audio</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
             
             <button class="btn-custom" onclick="document.getElementById('bgInput').click()">Background</button>
-            <input type="file" id="bgInput" accept=".jpg, .jpeg, .png, .webp, .gif, image/jpeg, image/png, image/webp" class="hidden">
+            <!-- FIX: Menggunakan image/* untuk kompatibilitas Android -->
+            <input type="file" id="bgInput" accept="image/*, .jpg, .jpeg, .png, .webp, .gif" class="hidden">
             <button class="btn-custom" id="btnHapusBg">Hapus Background</button>
             
             <div class="w-px h-4 bg-gray-700 mx-1"></div>
@@ -1150,6 +1155,10 @@
 
         function setupAudio() {
             if (audioContext) {
+                // FIX ANDROID: Pastikan audio context dibangunkan kembali jika tertidur
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
                 if (realtimeAnalyser) {
                     analyser = realtimeAnalyser;
                     dataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -1182,7 +1191,17 @@
             document.getElementById('track-name-display').textContent = file.name;
             document.getElementById('no-audio-text').style.display = 'none';
             renderPlaylist();
-            if (isPlaying) audioElement.play().catch(e => console.error(e));
+            
+            // FIX ANDROID: Paksa browser memuat audio terlebih dahulu
+            audioElement.load();
+            if (isPlaying) {
+                audioElement.play().catch(e => {
+                    console.error("Auto-play diblokir Android:", e);
+                    isPlaying = false;
+                    updatePlayBtn();
+                    showNotification("Tekan ikon Play untuk memulai lagu");
+                });
+            }
         }
 
         function renderPlaylist() {
@@ -1258,7 +1277,13 @@
         playlistPanelDOM.addEventListener('drop', (e) => {
             e.preventDefault();
             playlistPanelDOM.classList.remove('drag-over');
-            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('audio/'));
+            
+            // FIX ANDROID: Longgarkan deteksi MP3 dari File Manager bawaan
+            const files = Array.from(e.dataTransfer.files).filter(f => 
+                f.type.startsWith('audio/') || 
+                f.name.toLowerCase().match(/\.(mp3|wav|m4a|aac|ogg|flac)$/)
+            );
+            
             if (files.length === 0) return;
             files.forEach(file => playlist.push({ file: file }));
             if (currentTrackIndex === -1 && playlist.length > 0) loadTrack(0); else renderPlaylist();
